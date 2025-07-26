@@ -1,5 +1,7 @@
 package com.viktools;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -10,14 +12,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class VikToolsApplication {
 
+    private static final Logger logger = LoggerFactory.getLogger(VikToolsApplication.class);
+
     public static void main(String[] args) {
         SpringApplication.run(VikToolsApplication.class, args);
-        System.out.println();
-        System.out.println("===========================================");
-        System.out.println("🚀 VikTools 已啟動！");
-        System.out.println("📱 訪問地址: http://localhost:8080");
-        System.out.println("📚 API 文件: http://localhost:8080/swagger-ui.html");
-        System.out.println("===========================================");
-        System.out.println();
+        logger.info("");
+        logger.info("===========================================");
+        logger.info("🚀 VikTools 已啟動！");
+        logger.info("📱 訪問地址: http://localhost:8080");
+        logger.info("📚 API 文件: http://localhost:8080/swagger-ui.html");
+        logger.info("===========================================");
+        logger.info("");
     }
 }
