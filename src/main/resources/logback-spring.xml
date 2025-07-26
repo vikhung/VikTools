@@ -9,6 +9,7 @@
             <charset>UTF-8</charset>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- [%15.15t] %-40.40logger{39} : %m%n</pattern>
         </encoder>
+        <target>System.out</target>
     </appender>
 
     <!-- 滾動記錄文件 - 支持中文 -->
