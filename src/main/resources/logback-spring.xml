@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 定義日誌文件的存儲地址 -->
+    <property name="LOG_HOME" value="logs" />
+    
+    <!-- 控制台輸出 - 支持中文 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>UTF-8</charset>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- [%15.15t] %-40.40logger{39} : %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 滾動記錄文件 - 支持中文 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/viktools.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>UTF-8</charset>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/viktools.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Spring Boot 默認配置 -->
+    <springProfile name="!prod">
+        <logger name="com.viktools" level="INFO" additivity="false">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="FILE" />
+        </logger>
+        
+        <logger name="org.springframework" level="INFO" />
+        <logger name="org.apache" level="WARN" />
+        <logger name="org.hibernate" level="WARN" />
+        
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="FILE" />
+        </root>
+    </springProfile>
+
+    <!-- 生產環境配置 -->
+    <springProfile name="prod">
+        <logger name="com.viktools" level="INFO" additivity="false">
+            <appender-ref ref="FILE" />
+        </logger>
+        
+        <root level="WARN">
+            <appender-ref ref="FILE" />
+        </root>
+    </springProfile>
+</configuration>

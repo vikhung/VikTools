@@ -190,32 +190,45 @@
 
             <!-- PlantUML頁籤 -->
             <div id="plantuml" class="tab-content">
-                <div class="tool-card">
+                <div class="plantuml-container">
                     <h2><i class="fas fa-project-diagram"></i> PlantUML 圖表生成</h2>
-                    <div class="input-group">
-                        <label for="plantuml-input">PlantUML 語法：</label>
-                        <textarea id="plantuml-input" placeholder="@startuml
+                    <div class="plantuml-layout">
+                        <!-- 左側輸入區域 -->
+                        <div class="plantuml-input-panel">
+                            <div class="input-header">
+                                <label for="plantuml-input">PlantUML 語法</label>
+                                <div class="format-selector">
+                                    <select id="plantuml-format">
+                                        <option value="png">PNG 圖片</option>
+                                        <option value="svg">SVG 向量圖</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <textarea id="plantuml-input" placeholder="@startuml
 Alice -> Bob: Hello
-Bob -> Alice: Hi there
+Bob -> Alice: Hi there!
 @enduml"></textarea>
-                    </div>
-                    <div class="control-group">
-                        <select id="plantuml-format">
-                            <option value="png">PNG 圖片</option>
-                            <option value="svg">SVG 向量圖</option>
-                        </select>
-                        <button class="btn btn-primary" onclick="generateDiagram()">
-                            <i class="fas fa-magic"></i> 生成圖表
-                        </button>
-                    </div>
-                    <div class="output-group">
-                        <label>圖表預覽：</label>
-                        <div id="plantuml-preview" class="diagram-preview">
-                            <p class="placeholder">圖表將顯示在這裡...</p>
+                            <div class="input-footer">
+                                <small class="text-muted">按 Ctrl+Enter 或 Shift+Enter 生成圖表</small>
+                                <button class="btn btn-download" onclick="downloadDiagram()">
+                                    <i class="fas fa-download"></i> 下載圖表
+                                </button>
+                            </div>
                         </div>
-                        <button class="btn btn-copy" onclick="downloadDiagram()">
-                            <i class="fas fa-download"></i> 下載圖表
-                        </button>
+                        
+                        <!-- 右側預覽區域 -->
+                        <div class="plantuml-preview-panel">
+                            <div class="preview-header">
+                                <label>圖表預覽</label>
+                                <div class="preview-status" id="plantuml-status">就緒</div>
+                            </div>
+                            <div id="plantuml-preview" class="diagram-preview">
+                                <div class="placeholder">
+                                    <i class="fas fa-project-diagram" style="font-size: 3rem; color: #ccc; margin-bottom: 10px;"></i>
+                                    <p>輸入 PlantUML 語法後按 Ctrl+Enter 生成圖表</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

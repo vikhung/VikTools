@@ -380,11 +380,18 @@ async function generateDiagram() {
     const input = document.getElementById('plantuml-input').value;
     const format = document.getElementById('plantuml-format').value;
     const preview = document.getElementById('plantuml-preview');
+    const status = document.getElementById('plantuml-status');
 
     if (!input.trim()) {
         showMessage('請輸入 PlantUML 語法', 'error');
+        status.textContent = '錯誤';
+        status.className = 'preview-status error';
         return;
     }
+
+    // 更新狀態為生成中
+    status.textContent = '生成中...';
+    status.className = 'preview-status generating';
 
     // 顯示載入中狀態
     preview.innerHTML = `
@@ -444,6 +451,8 @@ async function generateDiagram() {
         }
 
         showMessage('圖表生成成功！', 'success');
+        status.textContent = '完成';
+        status.className = 'preview-status success';
     } catch (error) {
         console.error('生成圖表時發生錯誤:', error);
         preview.innerHTML = `
@@ -455,6 +464,8 @@ async function generateDiagram() {
             </div>
         `;
         showMessage('圖表生成失敗：' + error.message, 'error');
+        status.textContent = '錯誤';
+        status.className = 'preview-status error';
         currentDiagramBlob = null;
     }
 }
@@ -510,10 +521,18 @@ async function validatePlantUMLSyntax() {
     }
 }
 
-// 為 PlantUML 輸入框添加即時語法驗證
+// 為 PlantUML 輸入框添加 Enter 鍵執行和即時語法驗證
 document.addEventListener('DOMContentLoaded', function() {
     const plantumlInput = document.getElementById('plantuml-input');
     if (plantumlInput) {
+        // 添加 Enter 鍵監聽（Ctrl+Enter 或 Shift+Enter）
+        plantumlInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && (event.ctrlKey || event.shiftKey)) {
+                event.preventDefault();
+                generateDiagram();
+            }
+        });
+
         // 添加即時語法驗證（防抖處理）
         let validationTimeout;
         plantumlInput.addEventListener('input', function() {
