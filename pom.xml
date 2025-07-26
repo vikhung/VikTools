@@ -9,7 +9,7 @@
         <relativePath/>
     </parent>
     <groupId>com.viktools</groupId>
-    <artifactId>viktools</artifactId>
+    <artifactId>VikTools</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>VikTools</name>
     <description>網頁工具集，包含加解密、編碼、雜湊、JWE/JWS、PlantUML等工作小工具</description>

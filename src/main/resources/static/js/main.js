@@ -374,7 +374,9 @@ function verifyJWT() {
 // PlantUML 工具功能
 // =========================
 
-function generateDiagram() {
+let currentDiagramBlob = null; // 儲存當前生成的圖表數據
+
+async function generateDiagram() {
     const input = document.getElementById('plantuml-input').value;
     const format = document.getElementById('plantuml-format').value;
     const preview = document.getElementById('plantuml-preview');
@@ -384,23 +386,142 @@ function generateDiagram() {
         return;
     }
 
-    // 前端無法直接生成 PlantUML 圖，需要後端 API
+    // 顯示載入中狀態
     preview.innerHTML = `
         <div class="placeholder">
-            <i class="fas fa-image" style="font-size: 3rem; color: #ccc; margin-bottom: 10px;"></i>
-            <p>PlantUML 圖表生成需要後端 API 支援</p>
-            <p>輸入的語法：</p>
-            <pre style="text-align: left; background: #f8f9fa; padding: 10px; border-radius: 5px;">${input}</pre>
-            <p>格式：${format.toUpperCase()}</p>
+            <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: #007bff; margin-bottom: 10px;"></i>
+            <p>正在生成圖表...</p>
         </div>
     `;
-    
-    showMessage('圖表生成功能需要後端 API 支援', 'error');
+
+    try {
+        let endpoint, contentType;
+        
+        // 根據格式選擇不同的端點
+        if (format === 'png') {
+            endpoint = '/plantuml/generate/png';
+            contentType = 'image/png';
+        } else if (format === 'svg') {
+            endpoint = '/plantuml/generate/svg';
+            contentType = 'image/svg+xml';
+        } else {
+            throw new Error('目前不支援 ASCII Art 格式');
+        }
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain'
+            },
+            body: input
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        if (format === 'png') {
+            // 處理 PNG 圖片
+            const blob = await response.blob();
+            currentDiagramBlob = blob;
+            const imageUrl = URL.createObjectURL(blob);
+            
+            preview.innerHTML = `
+                <div class="diagram-container">
+                    <img src="${imageUrl}" alt="PlantUML Diagram" style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+            `;
+        } else if (format === 'svg') {
+            // 處理 SVG 圖片
+            const svgContent = await response.text();
+            currentDiagramBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+            
+            preview.innerHTML = `
+                <div class="diagram-container">
+                    ${svgContent}
+                </div>
+            `;
+        }
+
+        showMessage('圖表生成成功！', 'success');
+    } catch (error) {
+        console.error('生成圖表時發生錯誤:', error);
+        preview.innerHTML = `
+            <div class="placeholder">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 10px;"></i>
+                <p>圖表生成失敗</p>
+                <p>錯誤訊息：${error.message}</p>
+                <p>請檢查 PlantUML 語法是否正確</p>
+            </div>
+        `;
+        showMessage('圖表生成失敗：' + error.message, 'error');
+        currentDiagramBlob = null;
+    }
 }
 
 function downloadDiagram() {
-    showMessage('下載功能需要後端 API 支援', 'error');
+    if (!currentDiagramBlob) {
+        showMessage('請先生成圖表再下載', 'error');
+        return;
+    }
+
+    try {
+        const format = document.getElementById('plantuml-format').value;
+        const url = URL.createObjectURL(currentDiagramBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `plantuml-diagram.${format}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showMessage('圖表下載成功！', 'success');
+    } catch (error) {
+        showMessage('下載失敗：' + error.message, 'error');
+    }
 }
+
+// 驗證 PlantUML 語法
+async function validatePlantUMLSyntax() {
+    const input = document.getElementById('plantuml-input').value;
+    
+    if (!input.trim()) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/plantuml/validate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain'
+            },
+            body: input
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            if (!result.valid) {
+                showMessage('PlantUML 語法可能有誤', 'warning');
+            }
+        }
+    } catch (error) {
+        console.error('語法驗證失敗:', error);
+    }
+}
+
+// 為 PlantUML 輸入框添加即時語法驗證
+document.addEventListener('DOMContentLoaded', function() {
+    const plantumlInput = document.getElementById('plantuml-input');
+    if (plantumlInput) {
+        // 添加即時語法驗證（防抖處理）
+        let validationTimeout;
+        plantumlInput.addEventListener('input', function() {
+            clearTimeout(validationTimeout);
+            validationTimeout = setTimeout(validatePlantUMLSyntax, 1000);
+        });
+    }
+});
 
 // =========================
 // 頁面載入完成後的初始化
