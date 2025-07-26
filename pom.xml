@@ -63,6 +63,7 @@
     </dependencies>
 
     <build>
+        <finalName>VikTools</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -74,7 +75,17 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                    <!-- 確保創建可執行的 fat jar -->
+                    <executable>true</executable>
+                    <mainClass>com.viktools.VikToolsApplication</mainClass>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <!-- Maven Site Plugin -->
             <plugin>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-TW" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VikTools - 多功能工具集</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-tools"></i> VikTools</h1>
+            <p class="subtitle">專業工具集合 - 加解密、編碼、雜湊、JWT、PlantUML</p>
+        </header>
+
+        <nav class="tab-navigation">
+            <button class="tab-button active" onclick="showTab('crypto')">
+                <i class="fas fa-lock"></i> 加解密
+            </button>
+            <button class="tab-button" onclick="showTab('encoding')">
+                <i class="fas fa-code"></i> 編碼
+            </button>
+            <button class="tab-button" onclick="showTab('hash')">
+                <i class="fas fa-hashtag"></i> 雜湊
+            </button>
+            <button class="tab-button" onclick="showTab('jwt')">
+                <i class="fas fa-key"></i> JWT
+            </button>
+            <button class="tab-button" onclick="showTab('plantuml')">
+                <i class="fas fa-project-diagram"></i> PlantUML
+            </button>
+        </nav>
+
+        <main class="content">
+            <!-- 加解密頁籤 -->
+            <div id="crypto" class="tab-content active">
+                <div class="tool-card">
+                    <h2><i class="fas fa-lock"></i> 加解密工具</h2>
+                    <div class="input-group">
+                        <label for="crypto-input">輸入文字：</label>
+                        <textarea id="crypto-input" placeholder="請輸入要加密或解密的文字..."></textarea>
+                    </div>
+                    <div class="control-group">
+                        <select id="crypto-algorithm">
+                            <option value="aes">AES-256</option>
+                            <option value="des">3DES</option>
+                            <option value="rsa">RSA</option>
+                        </select>
+                        <input type="password" id="crypto-key" placeholder="密鑰">
+                        <button class="btn btn-primary" onclick="encrypt()">
+                            <i class="fas fa-lock"></i> 加密
+                        </button>
+                        <button class="btn btn-secondary" onclick="decrypt()">
+                            <i class="fas fa-unlock"></i> 解密
+                        </button>
+                    </div>
+                    <div class="output-group">
+                        <label for="crypto-output">輸出結果：</label>
+                        <textarea id="crypto-output" readonly placeholder="結果將顯示在這裡..."></textarea>
+                        <button class="btn btn-copy" onclick="copyToClipboard('crypto-output')">
+                            <i class="fas fa-copy"></i> 複製
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 編碼頁籤 -->
+            <div id="encoding" class="tab-content">
+                <div class="tool-card">
+                    <h2><i class="fas fa-code"></i> 編碼工具</h2>
+                    <div class="input-group">
+                        <label for="encoding-input">輸入文字：</label>
+                        <textarea id="encoding-input" placeholder="請輸入要編碼或解碼的文字..."></textarea>
+                    </div>
+                    <div class="control-group">
+                        <select id="encoding-type">
+                            <option value="base64">Base64</option>
+                            <option value="url">URL編碼</option>
+                            <option value="html">HTML編碼</option>
+                            <option value="hex">十六進制</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="encode()">
+                            <i class="fas fa-arrow-right"></i> 編碼
+                        </button>
+                        <button class="btn btn-secondary" onclick="decode()">
+                            <i class="fas fa-arrow-left"></i> 解碼
+                        </button>
+                    </div>
+                    <div class="output-group">
+                        <label for="encoding-output">輸出結果：</label>
+                        <textarea id="encoding-output" readonly placeholder="結果將顯示在這裡..."></textarea>
+                        <button class="btn btn-copy" onclick="copyToClipboard('encoding-output')">
+                            <i class="fas fa-copy"></i> 複製
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 雜湊頁籤 -->
+            <div id="hash" class="tab-content">
+                <div class="tool-card">
+                    <h2><i class="fas fa-hashtag"></i> 雜湊工具</h2>
+                    <div class="input-group">
+                        <label for="hash-input">輸入文字：</label>
+                        <textarea id="hash-input" placeholder="請輸入要計算雜湊的文字..."></textarea>
+                    </div>
+                    <div class="control-group">
+                        <select id="hash-algorithm">
+                            <option value="md5">MD5</option>
+                            <option value="sha1">SHA-1</option>
+                            <option value="sha256">SHA-256</option>
+                            <option value="sha512">SHA-512</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="generateHash()">
+                            <i class="fas fa-calculator"></i> 計算雜湊
+                        </button>
+                    </div>
+                    <div class="output-group">
+                        <label for="hash-output">雜湊結果：</label>
+                        <textarea id="hash-output" readonly placeholder="雜湊值將顯示在這裡..."></textarea>
+                        <button class="btn btn-copy" onclick="copyToClipboard('hash-output')">
+                            <i class="fas fa-copy"></i> 複製
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JWT頁籤 -->
+            <div id="jwt" class="tab-content">
+                <div class="tool-card">
+                    <h2><i class="fas fa-key"></i> JWT 工具</h2>
+                    <div class="jwt-tabs">
+                        <button class="jwt-tab-btn active" onclick="showJWTTab('encode')">JWT 編碼</button>
+                        <button class="jwt-tab-btn" onclick="showJWTTab('decode')">JWT 解碼</button>
+                        <button class="jwt-tab-btn" onclick="showJWTTab('verify')">JWT 驗證</button>
+                    </div>
+                    
+                    <div id="jwt-encode" class="jwt-tab-content active">
+                        <div class="input-group">
+                            <label for="jwt-header">Header (JSON)：</label>
+                            <textarea id="jwt-header" placeholder='{"alg":"HS256","typ":"JWT"}'></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="jwt-payload">Payload (JSON)：</label>
+                            <textarea id="jwt-payload" placeholder='{"sub":"user123","name":"User Name","iat":1516239022}'></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="jwt-secret">密鑰：</label>
+                            <input type="password" id="jwt-secret" placeholder="請輸入密鑰">
+                        </div>
+                        <button class="btn btn-primary" onclick="generateJWT()">
+                            <i class="fas fa-key"></i> 生成 JWT
+                        </button>
+                    </div>
+
+                    <div id="jwt-decode" class="jwt-tab-content">
+                        <div class="input-group">
+                            <label for="jwt-token">JWT Token：</label>
+                            <textarea id="jwt-token" placeholder="請輸入完整的 JWT token..."></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="decodeJWT()">
+                            <i class="fas fa-unlock"></i> 解碼 JWT
+                        </button>
+                    </div>
+
+                    <div id="jwt-verify" class="jwt-tab-content">
+                        <div class="input-group">
+                            <label for="jwt-token-verify">JWT Token：</label>
+                            <textarea id="jwt-token-verify" placeholder="請輸入要驗證的 JWT token..."></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="jwt-secret-verify">密鑰：</label>
+                            <input type="password" id="jwt-secret-verify" placeholder="請輸入密鑰">
+                        </div>
+                        <button class="btn btn-primary" onclick="verifyJWT()">
+                            <i class="fas fa-check-circle"></i> 驗證 JWT
+                        </button>
+                    </div>
+
+                    <div class="output-group">
+                        <label for="jwt-output">結果：</label>
+                        <textarea id="jwt-output" readonly placeholder="結果將顯示在這裡..."></textarea>
+                        <button class="btn btn-copy" onclick="copyToClipboard('jwt-output')">
+                            <i class="fas fa-copy"></i> 複製
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PlantUML頁籤 -->
+            <div id="plantuml" class="tab-content">
+                <div class="tool-card">
+                    <h2><i class="fas fa-project-diagram"></i> PlantUML 圖表生成</h2>
+                    <div class="input-group">
+                        <label for="plantuml-input">PlantUML 語法：</label>
+                        <textarea id="plantuml-input" placeholder="@startuml
+Alice -> Bob: Hello
+Bob -> Alice: Hi there
+@enduml"></textarea>
+                    </div>
+                    <div class="control-group">
+                        <select id="plantuml-format">
+                            <option value="png">PNG</option>
+                            <option value="svg">SVG</option>
+                            <option value="txt">ASCII Art</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="generateDiagram()">
+                            <i class="fas fa-magic"></i> 生成圖表
+                        </button>
+                    </div>
+                    <div class="output-group">
+                        <label>圖表預覽：</label>
+                        <div id="plantuml-preview" class="diagram-preview">
+                            <p class="placeholder">圖表將顯示在這裡...</p>
+                        </div>
+                        <button class="btn btn-copy" onclick="downloadDiagram()">
+                            <i class="fas fa-download"></i> 下載圖表
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2025 VikTools - 專業工具集合</p>
+        </footer>
+    </div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>
